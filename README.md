@@ -48,3 +48,16 @@ def quick_features(df, client):
     features['pct_ndf'] = np.mean(dfc['product_type'] == 'ndf')
     
     return features
+
+
+
+all_clients = df['client_name'].unique()
+
+feature_list = []
+for client in all_clients:
+    f = quick_features(df, client)
+    f['client_name'] = client
+    feature_list.append(f)
+
+df_features = pd.DataFrame(feature_list).set_index('client_name')
+df_features.head()
