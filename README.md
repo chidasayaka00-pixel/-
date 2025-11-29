@@ -105,3 +105,31 @@ df_scored = score_cta_behavior(df_feat)
 cta_clients = aggregate_client_cta(df_scored)
 
 print(cta_clients.head(20))
+
+
+
+
+
+import yfinance as yf
+import pandas as pd
+
+def get_fx_rate(pair, start="2015-01-01"):
+    """
+    pair format example: 'USD/NZD'
+    Yahoo needs 'NZDUSD=X', so invert correctly.
+    """
+
+    base, quote = pair.split('/')
+
+    # Yahoo format: QUOTEBASE=X (inverted)
+    yahoo_symbol = f"{quote}{base}=X"
+
+    data = yf.download(yahoo_symbol, start=start)
+
+    # The downloaded series is quote/base
+    # We want base/quote (USD/NZD)
+    data['fx_rate'] = 1 / data['Adj Close']
+
+    return data[['fx_rate']].rename(columns={'fx_rate': pair})
+usdnzd = get_fx_rate("USD/NZD", start="2018-01-01")
+usdjpy = get_fx_rate("USD/JPY")
